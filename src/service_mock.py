@@ -1,4 +1,4 @@
-from src.QueueProcessor import QueueProcessor
+from src.queue_processor.QueueProcessor import QueueProcessor
 
 
 def process(message: dict[str, any]) -> dict[str, any]:
@@ -8,4 +8,4 @@ def process(message: dict[str, any]) -> dict[str, any]:
 
 if __name__ == "__main__":
     queue_processor = QueueProcessor("localhost", 6380, ["test_queue_1", "test_queue_2"])
-    queue_processor.run(process)
+    queue_processor.start(process)

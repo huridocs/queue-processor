@@ -1,0 +1,19 @@
+version: "3.8"
+services:
+  test_worker:
+    init: true
+    network_mode: "host"
+    entrypoint: [ "python3", "-m", "src.service_mock" ]
+    restart: unless-stopped
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - redis_queue_processor
+  redis_queue_processor:
+    network_mode: "host"
+    restart: unless-stopped
+    image: "redis:7.2.5"
+    command: redis-server --port 6380
+    environment:
+      - REDIS_REPLICATION_MODE=master

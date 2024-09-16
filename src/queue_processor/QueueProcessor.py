@@ -49,11 +49,11 @@ class QueueProcessor:
 
                     results = process(message["message"])
                     self.get_queue(results_queue_name).sendMessage().message(results).execute()
+            except NoMessageInQueue:
+                sleep(2)
             except redis.exceptions.ConnectionError:
                 self.queue_processor_logger.error(f"Error connecting to Redis: {self.redis_host}:{self.redis_port}")
                 sleep(30)
-            except NoMessageInQueue:
-                sleep(2)
             except Exception as e:
                 self.queue_processor_logger.error(f"Error: {e}", exc_info=True)
                 sleep(60)

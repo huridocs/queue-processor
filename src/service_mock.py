@@ -1,7 +1,10 @@
 from src.queue_processor.QueueProcessor import QueueProcessor
 
 
-def process(message: dict[str, any]) -> dict[str, any]:
+def process(message: dict[str, any]) -> dict[str, any] | None:
+    if "required_field" not in message:
+        return None
+
     message["processed"] = True
     return message
 

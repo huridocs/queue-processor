@@ -19,11 +19,13 @@ class TestQueueProcessor(TestCase):
 
         sleep(3)
 
-        queue_tasks_1.sendMessage().message({"test": "test_1"}).execute()
-        queue_tasks_1.sendMessage().message({"test": "test_2"}).execute()
-        queue_tasks_2.sendMessage().message({"test": "test_3"}).execute()
+        queue_tasks_1.sendMessage().message({"test": "test_0"}).execute()
+        queue_tasks_1.sendMessage().message({"required_field": True, "test": "test_1"}).execute()
+        queue_tasks_1.sendMessage().message({"required_field": True, "test": "test_2"}).execute()
+        queue_tasks_2.sendMessage().message({"test": "test_0"}).execute()
+        queue_tasks_2.sendMessage().message({"required_field": True, "test": "test_3"}).execute()
 
-        sleep(3)
+        sleep(5)
 
         result_message_1 = utils.decode_message(queue_results_1.receiveMessage().execute()["message"])
         result_message_2 = utils.decode_message(queue_results_1.receiveMessage().execute()["message"])

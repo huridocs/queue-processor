@@ -43,20 +43,16 @@ class QueueProcessor:
             for task_queue_name, results_queue_name in zip(self.task_queues_names, self.results_queues_names):
                 try:
                     self.create_queues()
-                    self.queue_processor_logger.info(f"Processing queue: {task_queue_name}")
                     task_queue = self.get_queue(task_queue_name)
                     message = task_queue.receiveMessage().execute()
                     task_queue.deleteMessage(qname=task_queue_name, id=message["id"]).execute()
+                    results = process(utils.decode_message(message["message"]))
 
-                    if "message" in message:
-                        message["message"] = utils.decode_message(message["message"])
+                    if results:
+                        self.get_queue(results_queue_name).sendMessage().message(results).execute()
+                        break
 
-                    results = process(message["message"])
-                    self.queue_processor_logger.info(f"Sending results to queue: {results_queue_name}")
-                    self.get_queue(results_queue_name).sendMessage().message(results).execute()
-                    break
                 except NoMessageInQueue:
-                    self.queue_processor_logger.info("No messages in queue")
                     sleep(2)
                 except redis.exceptions.ConnectionError:
                     self.exists_queues = False

@@ -7,12 +7,20 @@ from rsmq import RedisSMQ, cmd
 
 
 class QueueProcessor:
-    def __init__(self, redis_host: str, redis_port: int, queues_names_by_priority: list[str], logger: logging.Logger = None):
+    def __init__(
+        self,
+        redis_host: str,
+        redis_port: int,
+        queues_names_by_priority: list[str],
+        logger: logging.Logger = None,
+        delay_time_for_results: int = 0,
+    ):
+
         self.redis_host: str = redis_host
         self.redis_port: int = redis_port
         self.task_queues_names: list[str] = [queue_name + "_tasks" for queue_name in queues_names_by_priority]
         self.results_queues_names: list[str] = [queue_name + "_results" for queue_name in queues_names_by_priority]
-
+        self.delay_time_for_results = delay_time_for_results
         self.exists_queues = False
         if logger:
             self.queue_processor_logger = logger
@@ -49,7 +57,9 @@ class QueueProcessor:
                     results = process(utils.decode_message(message["message"]))
 
                     if results:
-                        self.get_queue(results_queue_name).sendMessage().message(results).execute()
+                        self.get_queue(results_queue_name).sendMessage(delay=self.delay_time_for_results).message(
+                            results
+                        ).execute()
                         break
 
                 except NoMessageInQueue:

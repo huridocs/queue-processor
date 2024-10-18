@@ -9,7 +9,7 @@ setup(
     name=PROJECT_NAME,
     packages=["queue_processor"],
     package_dir={"": "src"},
-    version="0.7",
+    version="0.8",
     url="https://github.com/huridocs/queue-processor",
     author="HURIDOCS",
     description="Manage queues on Uwazi services",

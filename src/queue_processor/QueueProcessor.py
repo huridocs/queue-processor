@@ -62,14 +62,15 @@ class QueueProcessor:
                     if not results:
                         continue
 
-                    try:
-                        restart = True if restart else restart_condition(message)
-                    except:
-                        restart = False
-
                     self.get_queue(results_queue_name).sendMessage(delay=self.delay_time_for_results).message(
                         results
                     ).execute()
+
+                    try:
+                        restart = restart_condition(message)
+                    except:
+                        restart = False
+
                     break
 
                 except NoMessageInQueue:

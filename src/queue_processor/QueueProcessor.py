@@ -69,7 +69,7 @@ class QueueProcessor:
                     try:
                         restart = restart_condition(message)
                     except:
-                        restart = False
+                        pass
 
                     break
 

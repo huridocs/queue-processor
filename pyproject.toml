@@ -1,0 +1,16 @@
+[project]
+name = "queue-processor"
+version = "2024.12.2.1"
+description = "Manage queues on Uwazi services"
+license = { file = "LICENSE" }
+authors = [{ name = "HURIDOCS" }]
+requires-python = ">= 3.10"
+dependencies = [
+    "PyRSMQ==0.5.1",
+    "redis==5.0.7",
+    "setuptools==75.4.0"
+]
+
+[project.urls]
+HURIDOCS = "https://huridocs.org"
+GitHub = "https://github.com/huridocs/queue-processor"

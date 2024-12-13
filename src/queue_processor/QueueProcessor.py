@@ -74,7 +74,7 @@ class QueueProcessor:
                     break
 
                 except NoMessageInQueue:
-                    sleep(2)
+                    sleep(0.3)
                 except redis.exceptions.ConnectionError:
                     self.exists_queues = False
                     self.queue_processor_logger.error(f"Error connecting to Redis: {self.redis_host}:{self.redis_port}")

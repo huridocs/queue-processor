@@ -1,6 +1,6 @@
 [project]
 name = "queue-processor"
-version = "2024.12.12.2"
+version = "2024.12.13.1"
 description = "Manage queues on Uwazi services"
 license = { file = "LICENSE" }
 authors = [{ name = "HURIDOCS" }]

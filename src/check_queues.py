@@ -2,7 +2,7 @@ from time import sleep
 
 from rsmq import RedisSMQ
 
-QUEUES_NAMES = ["development_ocr"]
+QUEUES_NAMES = ["development_segmentation", "development_ocr"]
 
 if __name__ == "__main__":
     for i in range(100):

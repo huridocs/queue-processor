@@ -32,6 +32,9 @@ class QueueProcessor:
         logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s", handlers=handlers)
         self.queue_processor_logger = logging.getLogger(__name__)
 
+    def send_message(self, message: dict[str, any]):
+        self.get_queue(self.task_queues_names[0]).sendMessage(delay=0).message(message).execute()
+
     def get_queue(self, queue_name):
         return RedisSMQ(host=self.redis_host, port=self.redis_port, qname=queue_name)
 

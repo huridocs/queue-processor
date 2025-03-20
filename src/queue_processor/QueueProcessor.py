@@ -58,9 +58,11 @@ class QueueProcessor:
                     self.create_queues()
                     task_queue = self.get_queue(task_queue_name)
                     message = task_queue.receiveMessage().execute()
-                    task_queue.deleteMessage(qname=task_queue_name, id=message["id"]).execute()
                     message = utils.decode_message(message["message"])
-                    results = process(message)
+                    results, delete_message = process(message)
+
+                    if delete_message:
+                        task_queue.deleteMessage(qname=task_queue_name, id=message["id"]).execute()
 
                     if not results:
                         continue

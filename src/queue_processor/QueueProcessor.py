@@ -6,6 +6,8 @@ import redis
 from rsmq.cmd import NoMessageInQueue, utils
 from rsmq import RedisSMQ, cmd
 
+from src.queue_processor.QueueProcessResults import QueueProcessResults
+
 
 class QueueProcessor:
     def __init__(
@@ -59,16 +61,19 @@ class QueueProcessor:
                     task_queue = self.get_queue(task_queue_name)
                     raw_message = task_queue.receiveMessage().execute()
                     message = utils.decode_message(raw_message["message"])
-                    results, delete_message = process(message)
-
-                    if delete_message:
+                    queue_processor_results: QueueProcessResults = process(message)
+                    if queue_processor_results.delete_message:
                         task_queue.deleteMessage(qname=task_queue_name, id=raw_message["id"]).execute()
+                    else:
+                        task_queue.changeMessageVisibility(
+                            id=raw_message["id"], vt=queue_processor_results.invisibility_timeout
+                        ).execute()
 
-                    if not results:
+                    if not queue_processor_results.results:
                         continue
 
                     self.get_queue(results_queue_name).sendMessage(delay=self.delay_time_for_results).message(
-                        results
+                        queue_processor_results.results
                     ).execute()
 
                     try:

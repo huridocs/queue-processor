@@ -2,7 +2,7 @@ from time import sleep
 
 from rsmq import RedisSMQ
 
-QUEUES_NAMES = ["production_extract_paragraphs"]
+QUEUES_NAMES = ["extract_paragraphs"]
 
 if __name__ == "__main__":
     for i in range(100):

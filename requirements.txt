@@ -1,3 +1,4 @@
-PyRSMQ==0.5.1
+PyRSMQ==0.6.0
 redis==5.0.7
 setuptools==75.4.0
+pydantic==2.10.6

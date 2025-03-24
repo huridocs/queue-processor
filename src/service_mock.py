@@ -1,12 +1,13 @@
+from src.queue_processor.QueueProcessResults import QueueProcessResults
 from src.queue_processor.QueueProcessor import QueueProcessor
 
 
-def process(message: dict[str, any]) -> tuple[dict[str, any] | None, bool]:
+def process(message: dict[str, any]) -> QueueProcessResults:
     if "required_field" not in message:
-        return None, True
+        return QueueProcessResults()
 
     message["processed"] = True
-    return message, True
+    return QueueProcessResults(results=message)
 
 
 if __name__ == "__main__":

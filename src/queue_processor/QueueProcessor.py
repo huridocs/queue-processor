@@ -6,7 +6,7 @@ import redis
 from rsmq.cmd import NoMessageInQueue, utils
 from rsmq import RedisSMQ, cmd
 
-from src.queue_processor.QueueProcessResults import QueueProcessResults
+from queue_processor.QueueProcessResults import QueueProcessResults
 
 
 class QueueProcessor:

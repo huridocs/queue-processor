@@ -15,3 +15,4 @@ RUN pip --default-timeout=1000 install -r requirements.txt
 
 WORKDIR /app
 COPY ./src ./src
+ENV PYTHONPATH "${PYTHONPATH}:/app/src"

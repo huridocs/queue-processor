@@ -2,7 +2,7 @@ from time import sleep
 
 from rsmq import RedisSMQ
 
-QUEUES_NAMES = ["extract_paragraphs"]
+QUEUES_NAMES = ["production_information_extraction"]
 
 if __name__ == "__main__":
     for i in range(100):
@@ -15,6 +15,7 @@ if __name__ == "__main__":
                 queue = RedisSMQ(host="localhost", qname=f"{queue_name}_results")
                 print(queue.getQueueAttributes().exec_command())
             except:
+                print("queue does not exist")
                 pass
             print()
 

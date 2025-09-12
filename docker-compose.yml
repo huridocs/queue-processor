@@ -17,3 +17,11 @@ services:
     command: redis-server --port 6380
     environment:
       - REDIS_REPLICATION_MODE=master
+  redis_commander:
+    network_mode: "host"
+    restart: unless-stopped
+    image: "rediscommander/redis-commander:latest"
+    environment:
+      - REDIS_HOSTS=local:localhost:6380
+    ports:
+      - "8081:8081"

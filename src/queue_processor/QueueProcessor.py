@@ -1,11 +1,12 @@
+from typing import Any
 import logging
 from time import sleep
-from typing import Callable
 
 import redis
 from rsmq.cmd import NoMessageInQueue, utils
 from rsmq import RedisSMQ, cmd
 
+from queue_processor.QueueProcess import QueueProcess
 from queue_processor.QueueProcessResults import QueueProcessResults
 
 
@@ -34,7 +35,7 @@ class QueueProcessor:
         logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s", handlers=handlers)
         self.queue_processor_logger = logging.getLogger(__name__)
 
-    def send_message(self, message: dict[str, any]):
+    def send_message(self, message: dict[str, Any]):
         self.get_queue(self.task_queues_names[0]).sendMessage(delay=0).message(message).execute()
 
     def get_queue(self, queue_name):
@@ -51,23 +52,41 @@ class QueueProcessor:
                 self.queue_processor_logger.info(f"Creating queue {queue_name}")
                 self.get_queue(queue_name).createQueue(maxsize=-1).vt(120).exceptions(False).execute()
 
-    def start(self, process: callable, restart_condition: Callable = None):
+    def start(self, queue_process: QueueProcess):
         self.queue_processor_logger.info("QueueProcessor running")
         while True:
-            restart = False
             for task_queue_name, results_queue_name in zip(self.task_queues_names, self.results_queues_names):
                 try:
                     self.create_queues()
                     task_queue = self.get_queue(task_queue_name)
                     raw_message = task_queue.receiveMessage().execute()
-                    message = utils.decode_message(raw_message["message"])
-                    queue_processor_results: QueueProcessResults = process(message)
-                    if queue_processor_results.delete_message:
-                        task_queue.deleteMessage(qname=task_queue_name, id=raw_message["id"]).execute()
+                except NoMessageInQueue:
+                    task_queue = self.get_queue(task_queue_name)
+                    raw_message = None
+                except redis.exceptions.ConnectionError:
+                    self.exists_queues = False
+                    self.queue_processor_logger.error(f"Error connecting to Redis: {self.redis_host}:{self.redis_port}")
+                    sleep(30)
+                    break
+                except Exception as e:
+                    self.exists_queues = False
+                    self.queue_processor_logger.error(f"Error: {e}", exc_info=True)
+                    sleep(30)
+                    break
+
+                try:
+                    if raw_message:
+                        message = utils.decode_message(raw_message["message"])
+                        queue_processor_results: QueueProcessResults = queue_process.process_message(message)
+
+                        if queue_processor_results.delete_message:
+                            task_queue.deleteMessage(qname=task_queue_name, id=raw_message["id"]).execute()
+                        else:
+                            task_queue.changeMessageVisibility(
+                                id=raw_message["id"], vt=queue_processor_results.invisibility_timeout
+                            ).execute()
                     else:
-                        task_queue.changeMessageVisibility(
-                            id=raw_message["id"], vt=queue_processor_results.invisibility_timeout
-                        ).execute()
+                        queue_processor_results: QueueProcessResults = queue_process.process(task_queue_name)
 
                     if not queue_processor_results.results:
                         continue
@@ -75,25 +94,7 @@ class QueueProcessor:
                     self.get_queue(results_queue_name).sendMessage(delay=self.delay_time_for_results).message(
                         queue_processor_results.results
                     ).execute()
-
-                    try:
-                        restart = restart_condition(message)
-                    except:
-                        pass
-
-                    break
-
-                except NoMessageInQueue:
-                    sleep(0.3)
-                except redis.exceptions.ConnectionError:
-                    self.exists_queues = False
-                    self.queue_processor_logger.error(f"Error connecting to Redis: {self.redis_host}:{self.redis_port}")
-                    sleep(30)
+                    sleep(0.1)
                 except Exception as e:
-                    self.exists_queues = False
                     self.queue_processor_logger.error(f"Error: {e}", exc_info=True)
-                    sleep(60)
-
-            if restart:
-                sleep(self.delay_time_for_results + 5)
-                break
+                    sleep(30)

@@ -5,14 +5,14 @@ from src.queue_processor.QueueProcess import QueueProcess
 
 
 class MockQueueProcess(QueueProcess):
-    def process_message(self, message: dict[str, Any]) -> QueueProcessResults:
+    def process_message(self, queue_name: str, message: dict[str, Any]) -> QueueProcessResults:
         if "required_field" not in message:
             return QueueProcessResults()
 
         message["processed"] = True
         return QueueProcessResults(results=message)
 
-    def process(self, task_queue_name: str) -> QueueProcessResults:
+    def process(self, queue_name: str) -> QueueProcessResults:
         return QueueProcessResults()
 
 

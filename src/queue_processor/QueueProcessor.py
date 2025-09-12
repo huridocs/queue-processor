@@ -77,7 +77,9 @@ class QueueProcessor:
                 try:
                     if raw_message:
                         message = utils.decode_message(raw_message["message"])
-                        queue_processor_results: QueueProcessResults = queue_process.process_message(message)
+                        queue_processor_results: QueueProcessResults = queue_process.process_message(
+                            task_queue_name, message
+                        )
 
                         if queue_processor_results.delete_message:
                             task_queue.deleteMessage(qname=task_queue_name, id=raw_message["id"]).execute()

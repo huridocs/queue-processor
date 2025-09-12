@@ -6,9 +6,9 @@ from queue_processor.QueueProcessResults import QueueProcessResults
 class QueueProcess(ABC):
 
     @abstractmethod
-    def process_message(self, message) -> QueueProcessResults:
+    def process_message(self, queue_name: str, message) -> QueueProcessResults:
         pass
 
     @abstractmethod
-    def process(self, task_queue_name: str) -> QueueProcessResults:
+    def process(self, queue_name: str) -> QueueProcessResults:
         pass

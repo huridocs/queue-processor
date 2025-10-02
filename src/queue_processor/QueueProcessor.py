@@ -91,6 +91,7 @@ class QueueProcessor:
                         queue_processor_results: QueueProcessResults = queue_process.process(task_queue_name)
 
                     if not queue_processor_results.results:
+                        sleep(0.5)
                         continue
 
                     self.get_queue(results_queue_name).sendMessage(delay=self.delay_time_for_results).message(

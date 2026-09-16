@@ -13,7 +13,7 @@ services:
   redis_queue_processor:
     network_mode: "host"
     restart: unless-stopped
-    image: "redis:7.2.5"
+    image: "redis:8.10.1"
     command: redis-server --port 6380
     environment:
       - REDIS_REPLICATION_MODE=master

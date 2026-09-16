@@ -1,6 +1,10 @@
+[build-system]
+requires = ["setuptools>=64", "setuptools-scm>=8"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "queue-processor"
-version = "2025.03.24.02"
+dynamic = ["version"]
 description = "Manage queues on Uwazi services"
 license = { file = "LICENSE" }
 authors = [{ name = "HURIDOCS" }]
@@ -19,3 +23,4 @@ GitHub = "https://github.com/huridocs/queue-processor"
 version_scheme = "post-release"
 local_scheme = "no-local-version"
 write_to = "_version.py"
+tag_regex = "^(?P<prefix>v)?(?P<version>\\d+(?:\\.\\d+)*)$"
